@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Go Server • Home</title>
+  <meta name="description" content="A modern static homepage served by a Go (Golang) web server." />
+  <style>
+    :root{
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.06);
+      --text: #e8eefc;
+      --muted: #adbbda;
+      --brand: #7c9aff;
+      --brand-2: #9a7cff;
+      --ring: rgba(124,154,255,0.6);
+      --shadow: 0 20px 40px rgba(0,0,0,0.35);
+      --radius: 18px;
+      --glass: blur(10px) saturate(150%);
+    }
+    @media (prefers-color-scheme: light) {
+      :root{
+        --bg: #f7f8ff;
+        --card: rgba(0,8,40,0.04);
+        --text: #0b1020;
+        --muted: #3c4d6e;
+        --brand: #335bff;
+        --brand-2: #7a3bff;
+        --ring: rgba(51,91,255,0.35);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 1200px at -10% -10%, rgba(124,154,255,0.18), transparent 60%),
+        radial-gradient(800px 800px at 110% 10%, rgba(154,124,255,0.16), transparent 60%),
+        linear-gradient(180deg, var(--bg), #060914 45%, #06070f);
+      overflow-x:hidden;
+    }
+
+    .container{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom: 24px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.4px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: conic-gradient(from 210deg, var(--brand), var(--brand-2));
+      box-shadow: 0 8px 20px rgba(124,154,255,.45), inset 0 2px 10px rgba(255,255,255,.2);
+    }
+    .links a{
+      color: var(--text); text-decoration:none; opacity:.85; margin-left:16px; font-weight:600;
+      padding: 10px 14px; border-radius: 12px;
+    }
+    .links a:hover{ background: var(--card); }
+
+    .hero{
+      position:relative;
+      border-radius: calc(var(--radius) + 8px);
+      padding: 42px 28px;
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      isolation:isolate;
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(500px 140px at 20% 0%, rgba(124,154,255,.18), transparent 60%),
+        radial-gradient(600px 200px at 80% 0%, rgba(154,124,255,.16), transparent 65%);
+      z-index:-1;
+      filter: blur(6px);
+    }
+    .hero h1{
+      margin:0 0 10px; font-size: clamp(28px, 4vw, 42px);
+      line-height:1.1; letter-spacing:.4px;
+    }
+    .hero p{
+      margin:0 0 18px; color: var(--muted); font-size: clamp(14px, 2vw, 18px);
+    }
+    .cta{
+      display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px;
+    }
+    .btn{
+      appearance:none; border:0; cursor:pointer; font-weight:700;
+      padding: 12px 16px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color:white; box-shadow: 0 10px 24px rgba(124,154,255,.35);
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .btn:hover{ transform: translateY(-2px); filter: brightness(1.05); }
+    .btn.secondary{
+      background: transparent; color: var(--text); border:1px solid rgba(255,255,255,.14);
+      box-shadow:none;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+      background: rgba(124,154,255,.12);
+      border:1px solid rgba(124,154,255,.25);
+      color: var(--text); font-weight:600; margin-bottom: 10px;
+    }
+
+    .grid{
+      display:grid; gap:18px; margin-top:26px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+    .card{
+      grid-column: span 12;
+      padding: 18px; background: var(--card); border-radius: var(--radius);
+      backdrop-filter: var(--glass); box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .card h3{ margin: 8px 0 6px; }
+    .card p{ margin: 0; color: var(--muted); }
+    @media (min-width: 800px){
+      .card.span-4{ grid-column: span 4; }
+      .card.span-8{ grid-column: span 8; }
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.2);
+      padding: 2px 6px; border-radius: 8px; font-size: .95em;
+    }
+
+    .footer{
+      margin-top: 36px; color: var(--muted); text-align:center; font-size: 14px;
+      opacity:.9;
+    }
+
+    .focus-ring:focus-visible{
+      outline: 3px solid var(--ring);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="nav" aria-label="Primary">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <span>Go Server</span>
+      </div>
+      <div class="links">
+        <a class="focus-ring" href="/" aria-current="page">Home</a>
+        <a class="focus-ring" href="/hello">/hello</a>
+        <a class="focus-ring" href="/form.html">Form</a>
+        <a class="focus-ring" href="https://go.dev/doc/" target="_blank" rel="noreferrer">Go Docs ↗</a>
+      </div>
+    </nav>
+
+    <section class="hero" role="region" aria-label="Hero">
+      <div class="tag">
+        <span>⚡</span> Served by Go’s <code class="kbd">net/http</code>
+      </div>
+      <h1>Modern static site, simple Go backend.</h1>
+      <p>Blazing fast, zero dependencies, and production-friendly architecture starter. Explore routes, submit a form, and extend as you like.</p>
+      <div class="cta">
+        <button class="btn focus-ring" id="copyCurl">Copy cURL for /hello</button>
+        <a class="btn secondary focus-ring" href="/form.html">Open Form</a>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Features">
+      <article class="card span-4">
+        <h3>Static Files</h3>
+        <p>Served from <code class="kbd">./static</code> with smart caching & a11y-ready markup.</p>
+      </article>
+      <article class="card span-4">
+        <h3>Form Handling</h3>
+        <p>Posts data to <code class="kbd">/form</code> and echoes validated input.</p>
+      </article>
+      <article class="card span-4">
+        <h3>Extendable</h3>
+        <p>Plug in a DB, add auth, or layer a SPA—your call.</p>
+      </article>
+
+      <article class="card span-8">
+        <h3>Quick Start</h3>
+        <p>Run locally with <code class="kbd">go run .</code>, then visit <code class="kbd">http://localhost:8080</code>.</p>
+      </article>
+      <article class="card span-4">
+        <h3>Pro Tip</h3>
+        <p>Try <code class="kbd">curl localhost:8080/hello</code> or click the button above to copy a ready command.</p>
+      </article>
+    </section>
+
+    <p class="footer">© <span id="y"></span> Go Server • Built with ❤️ and Golang</p>
+  </div>
+
+  <script>
+    // year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Copy a ready-to-run cURL command
+    const copyBtn = document.getElementById('copyCurl');
+    copyBtn.addEventListener('click', async () => {
+      const cmd = `curl -i http://localhost:8080/hello`;
+      try {
+        await navigator.clipboard.writeText(cmd);
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => copyBtn.textContent = "Copy cURL for /hello", 1400);
+      } catch {
+        // fallback: prompt
+        window.prompt("Copy this command:", cmd);
+      }
+    });
+
+    // Keyboard shortcut: press "F" to go to the form
+    window.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'f' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        window.location.href = '/form.html';
+      }
+    });
+  </script>
+</body>
+</html>
